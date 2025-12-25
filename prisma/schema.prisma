@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Category {
+  id             Int             @id @default(autoincrement()) @unique
+  name           String          @unique
+  items          Item[]
+  characteristics Characteristic[]
+}
+
+model Item {
+  id           Int         @id @default(autoincrement()) @unique
+  name         String      @unique
+  manufacturer String?
+  quantity     Int
+  price        String
+  categoryId   Int
+  category     Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  charValues   CharValue[]
+}
+
+model Characteristic {
+  id            Int         @id @default(autoincrement()) @unique
+  name          String      @unique
+  displayedName String      @map("displayed_name")
+  categoryId    Int
+  category      Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  charValues    CharValue[]
+}
+
+model CharValue {
+  id              Int           @id @default(autoincrement()) @unique
+  characteristicId Int          @map("characteristic")
+  itemId          Int            @map("item")
+  value           String
+  characteristic  Characteristic @relation(fields: [characteristicId], references: [id], onDelete: Cascade)
+  item            Item           @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
